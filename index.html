@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>SplitWise - Expense Splitter</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" crossorigin="anonymous">
+</head>
+<body>
+
+  <!-- LOADING -->
+  <div id="screen-loading" class="screen loading-screen">
+    <div class="loader-icon"><i class="fas fa-receipt"></i></div>
+    <h1 class="loader-brand">SplitWise</h1>
+    <p class="loader-tag">Split expenses. Stay fair.</p>
+    <div class="loader-bar"><div class="loader-fill"></div></div>
+  </div>
+
+  <!-- AUTH: SIGN UP -->
+  <div id="screen-signup" class="screen hidden">
+    <div class="auth-bg"><span></span><span></span><span></span></div>
+    <div class="auth-card">
+      <div class="auth-icon"><i class="fas fa-wallet"></i></div>
+      <h1>Create Account</h1>
+      <p class="sub">Start splitting expenses with friends</p>
+      <div id="signup-error" class="err-box hidden"></div>
+      <form id="signup-form">
+        <div class="field"><i class="fas fa-user"></i><input id="su-name" type="text" placeholder="Display Name" required></div>
+        <div class="field"><i class="fas fa-envelope"></i><input id="su-email" type="email" placeholder="Email" required></div>
+        <div class="field"><i class="fas fa-lock"></i><input id="su-pass" type="password" placeholder="Password (6+)" required minlength="6"></div>
+        <button type="submit" class="btn-primary">Sign Up <i class="fas fa-arrow-right"></i></button>
+      </form>
+      <p class="switch-link">Already have an account? <a href="#" id="go-signin">Sign In</a></p>
+    </div>
+  </div>
+
+  <!-- AUTH: CHECK EMAIL -->
+  <div id="screen-checkemail" class="screen hidden">
+    <div class="auth-card">
+      <div class="auth-icon"><i class="fas fa-envelope-open-text"></i></div>
+      <h1>Check Your Email</h1>
+      <p class="sub">We sent a confirmation link to <strong id="confirm-email"></strong>. Click it, then sign in.</p>
+      <button class="btn-primary" id="go-signin-email">Go to Sign In <i class="fas fa-arrow-right"></i></button>
+    </div>
+  </div>
+
+  <!-- AUTH: SIGN IN -->
+  <div id="screen-signin" class="screen hidden">
+    <div class="auth-bg"><span></span><span></span><span></span></div>
+    <div class="auth-card">
+      <div class="auth-icon"><i class="fas fa-wallet"></i></div>
+      <h1>Welcome Back</h1>
+      <p class="sub">Sign in to manage your expenses</p>
+      <div id="signin-error" class="err-box hidden"></div>
+      <form id="signin-form">
+        <div class="field"><i class="fas fa-envelope"></i><input id="si-email" type="email" placeholder="Email" required></div>
+        <div class="field"><i class="fas fa-lock"></i><input id="si-pass" type="password" placeholder="Password" required></div>
+        <button type="submit" class="btn-primary">Sign In <i class="fas fa-arrow-right"></i></button>
+      </form>
+      <p class="switch-link">New here? <a href="#" id="go-signup">Create Account</a></p>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="screen-app" class="screen hidden">
+    <nav class="navbar">
+      <div class="nav-left"><i class="fas fa-receipt nav-icon"></i><span class="nav-brand">SplitWise</span></div>
+      <div class="nav-right">
+        <span id="nav-user" class="nav-chip"></span>
+        <button id="btn-logout" class="nav-btn"><i class="fas fa-sign-out-alt"></i></button>
+      </div>
+    </nav>
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" data-tab="groups"><i class="fas fa-users"></i> Groups</button>
+      <button class="tab" data-tab="expenses"><i class="fas fa-receipt"></i> Expenses</button>
+      <button class="tab" data-tab="settle"><i class="fas fa-balance-scale"></i> Settle</button>
+    </div>
+
+    <!-- GROUPS PANEL -->
+    <div id="panel-groups" class="panel active">
+      <div class="panel-head">
+        <h2><i class="fas fa-users"></i> Your Groups</h2>
+        <button class="btn-fab" id="btn-new-group"><i class="fas fa-plus"></i></button>
+      </div>
+      <div id="groups-list" class="card-list"></div>
+
+      <!-- New Group Form -->
+      <div id="new-group-form" class="form-card hidden">
+        <h3><i class="fas fa-plus-circle"></i> New Group</h3>
+        <div class="field"><i class="fas fa-tag"></i><input id="group-name" type="text" placeholder="Group Name" required></div>
+        <div class="members-section">
+          <label>Members</label>
+          <div id="members-inputs">
+            <div class="field"><i class="fas fa-user"></i><input type="text" class="member-input" placeholder="Member name" required></div>
+          </div>
+          <button type="button" class="btn-text" id="btn-add-member"><i class="fas fa-plus"></i> Add Member</button>
+        </div>
+        <div class="form-actions">
+          <button class="btn-secondary" id="btn-cancel-group">Cancel</button>
+          <button class="btn-primary" id="btn-save-group"><i class="fas fa-check"></i> Create Group</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXPENSES PANEL -->
+    <div id="panel-expenses" class="panel">
+      <div id="no-group-selected" class="empty-state">
+        <i class="fas fa-hand-pointer"></i>
+        <h3>Select a Group</h3>
+        <p>Go to the Groups tab and tap a group to view expenses</p>
+      </div>
+      <div id="expenses-view" class="hidden">
+        <div class="panel-head">
+          <div>
+            <h2 id="exp-group-name"><i class="fas fa-receipt"></i> Expenses</h2>
+            <p id="exp-group-sub" class="sub-text"></p>
+          </div>
+          <button class="btn-fab" id="btn-new-expense"><i class="fas fa-plus"></i></button>
+        </div>
+        <!-- Category Filter -->
+        <div class="filter-bar" id="category-filter">
+          <button class="filter-btn active" data-cat="all">All</button>
+          <button class="filter-btn" data-cat="food"><i class="fas fa-utensils"></i> Food</button>
+          <button class="filter-btn" data-cat="transport"><i class="fas fa-car"></i> Transport</button>
+          <button class="filter-btn" data-cat="rent"><i class="fas fa-home"></i> Rent</button>
+          <button class="filter-btn" data-cat="utilities"><i class="fas fa-bolt"></i> Utilities</button>
+          <button class="filter-btn" data-cat="entertainment"><i class="fas fa-film"></i> Fun</button>
+          <button class="filter-btn" data-cat="other"><i class="fas fa-ellipsis-h"></i> Other</button>
+        </div>
+        <div id="expenses-total" class="total-bar"></div>
+        <div id="expenses-list" class="card-list"></div>
+
+        <!-- New Expense Form -->
+        <div id="new-expense-form" class="form-card hidden">
+          <h3><i class="fas fa-plus-circle"></i> New Expense</h3>
+          <div class="field"><i class="fas fa-align-left"></i><input id="exp-desc" type="text" placeholder="Description" required></div>
+          <div class="row-2">
+            <div class="field"><i class="fas fa-dollar-sign"></i><input id="exp-amount" type="number" placeholder="Amount" min="0.01" step="0.01" required></div>
+            <div class="field"><i class="fas fa-coins"></i>
+              <select id="exp-currency">
+                <option value="USD">USD</option>
+                <option value="EUR">EUR</option>
+                <option value="GBP">GBP</option>
+                <option value="JPY">JPY</option>
+                <option value="CAD">CAD</option>
+                <option value="AUD">AUD</option>
+                <option value="MXN">MXN</option>
+                <option value="BRL">BRL</option>
+                <option value="INR">INR</option>
+                <option value="CNY">CNY</option>
+              </select>
+            </div>
+          </div>
+          <div class="row-2">
+            <div class="field"><i class="fas fa-user"></i>
+              <select id="exp-paid-by"></select>
+            </div>
+            <div class="field"><i class="fas fa-folder"></i>
+              <select id="exp-category">
+                <option value="food">Food</option>
+                <option value="transport">Transport</option>
+                <option value="rent">Rent</option>
+                <option value="utilities">Utilities</option>
+                <option value="entertainment">Entertainment</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="field"><i class="fas fa-calendar"></i><input id="exp-date" type="date" required></div>
+          <div class="receipt-upload" id="receipt-upload">
+            <input type="file" id="receipt-file" accept="image/*" hidden>
+            <div id="receipt-placeholder" class="upload-placeholder">
+              <i class="fas fa-camera"></i>
+              <span>Attach Receipt Photo</span>
+            </div>
+            <img id="receipt-preview" class="receipt-preview hidden" alt="Receipt">
+          </div>
+          <div id="converted-note" class="converted-note hidden"></div>
+          <div class="form-actions">
+            <button class="btn-secondary" id="btn-cancel-expense">Cancel</button>
+            <button class="btn-primary" id="btn-save-expense"><i class="fas fa-check"></i> Add Expense</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTLE PANEL -->
+    <div id="panel-settle" class="panel">
+      <div id="no-group-settle" class="empty-state">
+        <i class="fas fa-hand-pointer"></i>
+        <h3>Select a Group</h3>
+        <p>Go to the Groups tab and tap a group to see balances</p>
+      </div>
+      <div id="settle-view" class="hidden">
+        <div class="panel-head">
+          <h2 id="settle-group-name"><i class="fas fa-balance-scale"></i> Settle Up</h2>
+        </div>
+        <div id="balances-list" class="card-list"></div>
+        <h3 class="section-title"><i class="fas fa-exchange-alt"></i> Suggested Payments</h3>
+        <div id="payments-list" class="card-list"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Receipt Modal -->
+  <div id="receipt-modal" class="modal hidden">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <button class="modal-close" id="modal-close-receipt"><i class="fas fa-times"></i></button>
+      <img id="modal-receipt-img" class="modal-img" alt="Receipt">
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
